@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Staff Requests</title>
+    <style>
+        body {
+            font-family: Rockwell, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            margin: 0 auto;
+        }
+        h1{
+            text-align: center;
+        }
+        h2{
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        input, select {
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        .signout-btn {
+            background-color: darkred;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: block;
+            text-align: center;
+        }
+        .signout-btn:hover {
+            background-color: red;
+        }
+        .filters {
+            margin-bottom: 20px;
+        }
+        .filters label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<button class="signout-btn" onclick="signOut()">Sign Out</button>
+
+<h1>Staff Portal</h1>
+<div class="container">
+    <h2>Maintenance Requests</h2>
+
+    <div class="filters">
+        <label for="filter-apartment">Apartment Number:</label>
+        <input type="text" id="filter-apartment" placeholder="Enter apartment number" oninput="filterRequests()">
+
+        <label for="filter-area">Area:</label>
+        <select id="filter-area" onchange="filterRequests()">
+            <option value="">All Areas</option>
+            <option value="Kitchen">Kitchen</option>
+            <option value="Bathroom">Bathroom</option>
+            <option value="Living Room">Living Room</option>
+            <option value="Bedroom">Bedroom</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label for="filter-status">Status:</label>
+        <select id="filter-status" onchange="filterRequests()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+        </select>
+
+        <label for="filter-date-start">From:</label>
+        <input type="date" id="filter-date-start" onchange="filterRequests()">
+
+        <label for="filter-date-end">To:</label>
+        <input type="date" id="filter-date-end" onchange="filterRequests()">
+    </div>
+
+    <!-- Requests Table -->
+    <table id="requests-table">
+        <thead>
+        <tr>
+            <th>Request ID</th>
+            <th>Apartment Number</th>
+            <th>Area</th>
+            <th>Description</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Requests will be added here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function signOut() {
+        window.location.href = 'MaintenaceApp.html';
+    }
+    let requests = [
+        // Dummy data for testing
+        { id: 1, apartmentNumber: '101', area: 'Kitchen', description: 'Leaking sink', dateTime: '2024-11-01 10:00 AM', status: 'pending' },
+        { id: 2, apartmentNumber: '102', area: 'Bathroom', description: 'Bathtub drain stuck', dateTime: '2024-11-02 11:30 AM', status: 'completed' },
+        { id: 3, apartmentNumber: '103', area: 'Living Room', description: 'AC not working', dateTime: '2024-11-03 09:00 AM', status: 'pending' }
+    ];
+
+    displayRequests(requests);
+
+    function displayRequests(requestList) {
+        const tableBody = document.querySelector("#requests-table tbody");
+        tableBody.innerHTML = ''; // Clear previous rows
+
+        requestList.forEach(request => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${request.id}</td>
+                <td>${request.apartmentNumber}</td>
+                <td>${request.area}</td>
+                <td>${request.description}</td>
+                <td>${request.dateTime}</td>
+                <td>${request.status}</td>
+                <td>
+                    ${request.status === 'pending' ? `<button onclick="updateStatus(${request.id})">Mark as Completed</button>` : 'Completed'}
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function filterRequests() {
+        const apartmentNumber = document.getElementById('filter-apartment').value.toLowerCase();
+        const area = document.getElementById('filter-area').value;
+        const status = document.getElementById('filter-status').value;
+        const dateStart = document.getElementById('filter-date-start').value;
+        const dateEnd = document.getElementById('filter-date-end').value;
+
+        const filteredRequests = requests.filter(request => {
+            let match = true;
+
+            if (apartmentNumber && !request.apartmentNumber.toLowerCase().includes(apartmentNumber)) {
+                match = false;
+            }
+
+            if (area && request.area !== area) {
+                match = false;
+            }
+
+            if (status && request.status !== status) {
+                match = false;
+            }
+
+            if (dateStart && new Date(request.dateTime) < new Date(dateStart)) {
+                match = false;
+            }
+
+            if (dateEnd && new Date(request.dateTime) > new Date(dateEnd)) {
+                match = false;
+            }
+
+            return match;
+        });
+
+        displayRequests(filteredRequests);
+    }
+
+    function updateStatus(id) {
+        const request = requests.find(r => r.id === id);
+        if (request && request.status === 'pending') {
+            request.status = 'completed';
+            displayRequests(requests);
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Login</title>
+    <style>
+        body {
+            font-family: Rockwell, sans-serif;
+            background-color: lightskyblue;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        h1 {
+            text-align: center;
+            color: black;
+            margin-bottom: 40px;
+        }
+        .login-box {
+            background: lightgray;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+        button {
+            width: 75%;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Maintenance Request App</h1>
+
+<div class="login-box">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <p id="error" style="color:red;"></p>
+</div>
+
+<script>
+    const users = [
+        { username: 'tenant100', password: 'tenantpw', role: 'tenant' },
+        { username: 'manager', password: 'managerpw', role: 'manager' },
+        { username: 'staff100', password: 'staffpw', role: 'maintenance team' }
+    ];
+
+    function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorElement = document.getElementById('error');
+
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            if (user.role === 'tenant') {
+                window.location.href = 'Tenant.html';
+            } else if (user.role === 'manager') {
+                window.location.href = 'Manager.html';
+            } else if (user.role === 'maintenance team') {
+                window.location.href = 'Maintenance Team.html';
+            }
+        } else {
+            errorElement.textContent = 'Invalid username or password';
+        }
+    }
+</script>
+
+</body>
+</html>

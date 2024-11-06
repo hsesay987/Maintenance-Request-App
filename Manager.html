@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Home</title>
+    <style>
+        body {
+            font-family: Rockwell, sans-serif;
+            background-color: lightcoral;
+            padding: 20px;
+        }
+        h1{
+            text-align: center;
+        }
+        h2{
+            text-align: center;
+        }
+        h3{
+            text-underline: black;
+            text-decoration: underline;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 75%;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .required::after {
+            content: " *";
+            color: darkred;
+        }
+        input, select {
+            padding: 10px;
+            margin-right: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: lightgreen;
+        }
+        .signout-btn {
+            background-color: darkred;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: block;
+            text-align: center;
+        }
+        .signout-btn:hover {
+            background-color: red;
+        }
+        .add-tenant, .move-tenant {
+            margin-bottom: 20px;
+        }
+        p {
+            color: black;
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<button class="signout-btn" onclick="signOut()">Sign Out</button>
+<h1>Manager Portal</h1>
+
+<div class="container">
+    <h2>Tenant Management</h2>
+
+    <div class="add-tenant">
+        <h3>Add New Tenant</h3>
+        <label for="tenant-name" class="required">Name:</label>
+        <input type="text" id="tenant-name" placeholder="Enter Name">
+
+        <label for="tenant-phone" class="required">Phone:</label>
+        <input type="text" id="tenant-phone" placeholder="Enter Phone Number">
+
+        <label for="tenant-email" class="required">Email:</label>
+        <input type="email" id="tenant-email" placeholder="Enter Email">
+
+        <label for="tenant-apartment" class="required">Apartment:</label>
+        <input type="text" id="tenant-apartment" placeholder="Enter Apartment Number">
+
+        <label for="check-in" class="required">Check-In:</label>
+        <input type="date" id="check-in">
+
+        <label for="check-out">Check-Out:</label>
+        <input type="date" id="check-out">
+
+        <button onclick="addTenant()">Add Tenant</button>
+
+    </div>
+
+    <!-- Move Tenant -->
+    <div class="move-tenant">
+        <h3>Move Tenant to Another Apartment</h3>
+        <label for="tenant-id-move" class="required">Tenant ID:</label>
+        <input type="text" id="tenant-id-move" placeholder="Enter ID">
+
+        <label for="new-apartment" class="required">New Apartment:</label>
+        <input type="text" id="new-apartment" placeholder="Enter Apartment Number">
+
+        <button onclick="moveTenant()">Move Tenant</button>
+    </div>
+
+    <p class="required">Required Field</p>
+
+    <h3>Tenant List</h3>
+    <table id="tenant-table">
+        <thead>
+        <tr>
+            <th>Tenant ID</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Apartment</th>
+            <th>Check-In</th>
+            <th>Check-Out</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Tenants will be added here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function signOut() {
+        window.location.href = 'MaintenaceApp.html';
+    }
+
+    let tenants = [];
+    let tenantId = 1;
+
+    // Function to add a new tenant
+    function addTenant() {
+        const name = document.getElementById('tenant-name').value;
+        const phone = document.getElementById('tenant-phone').value;
+        const email = document.getElementById('tenant-email').value;
+        const apartment = document.getElementById('tenant-apartment').value;
+        const checkIn = document.getElementById('check-in').value;
+        const checkOut = document.getElementById('check-out').value;
+
+        if (name && phone && email && apartment && checkIn && checkOut) {
+            const newTenant = {
+                id: tenantId++,
+                name,
+                phone,
+                email,
+                apartment,
+                checkIn,
+                checkOut
+            };
+
+            tenants.push(newTenant);
+            displayTenants();
+            resetForm();
+        }
+        else if(name && phone && email && apartment && checkIn){
+            const newTenant = {
+                id: tenantId++,
+                name,
+                phone,
+                email,
+                apartment,
+                checkIn
+            };
+
+            tenants.push(newTenant);
+            displayTenants();
+            resetForm();
+        }
+        else {
+            alert("Please fill in all fields");
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('tenant-name').value = '';
+        document.getElementById('tenant-phone').value = '';
+        document.getElementById('tenant-email').value = '';
+        document.getElementById('tenant-apartment').value = '';
+        document.getElementById('check-in').value = '';
+        document.getElementById('check-out').value = '';
+    }
+
+    function displayTenants() {
+        const tableBody = document.querySelector("#tenant-table tbody");
+        tableBody.innerHTML = ''; // Clear previous rows
+
+        tenants.forEach(tenant => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${tenant.id}</td>
+                <td>${tenant.name}</td>
+                <td>${tenant.phone}</td>
+                <td>${tenant.email}</td>
+                <td>${tenant.apartment}</td>
+                <td>${tenant.checkIn}</td>
+                <td>${tenant.checkOut}</td>
+                <td><button onclick="deleteTenant(${tenant.id})">Delete</button></td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function deleteTenant(id) {
+        tenants = tenants.filter(tenant => tenant.id !== id);
+        displayTenants();
+    }
+
+    function moveTenant() {
+        const tenantIdMove = parseInt(document.getElementById('tenant-id-move').value);
+        const newApartment = document.getElementById('new-apartment').value;
+
+        if (tenantIdMove && newApartment) {
+            const tenant = tenants.find(tenant => tenant.id === tenantIdMove);
+            if (tenant) {
+                tenant.apartment = newApartment;
+                displayTenants();
+            } else {
+                alert("Tenant not found");
+            }
+        } else {
+            alert("Please enter both Tenant ID and new apartment number");
+        }
+    }
+
+    // Example
+    tenants.push({
+        id: tenantId++,
+        name: 'John Doe',
+        phone: '555-1234',
+        email: 'john@example.com',
+        apartment: '101',
+        checkIn: '2024-01-01',
+        checkOut: '2024-12-31'
+    });
+
+    displayTenants();
+</script>
+
+</body>
+</html>

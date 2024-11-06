@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Home</title>
+    <style>
+        body {
+            font-family: Rockwell, sans-serif;
+            background-color: lightblue;
+            padding: 20px;
+        }
+        h1{
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .history, .request-form {
+            margin-top: 20px;
+        }
+        .request-form {
+            display: none;
+        }
+        textarea{
+            width: 50%;
+        }
+        button {
+            background-color: green;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: lightgreen;
+        }
+        .signout-btn {
+            background-color: darkred;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: block;
+            text-align: center;
+        }
+        .signout-btn:hover {
+            background-color: red;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid white;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<button class="signout-btn" onclick="signOut()">Sign Out</button>
+
+<h1>Tenant Home</h1>
+
+<div class="container">
+    <h2>Welcome!</h2>
+    <p>Apartment Number: <strong id="apartment-number">101</strong></p>
+
+    <div class="history">
+        <h3>Your Request History</h3>
+        <table id="request-history">
+            <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Apartment Number</th>
+                <th>Area</th>
+                <th>Description</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Photo</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- History entries will be added here -->
+            </tbody>
+        </table>
+        <button onclick="toggleRequestForm()">Submit New Request</button>
+    </div>
+
+    <div class="request-form">
+        <h3>Submit a New Request</h3>
+        <label for="area">Area of the Problem:</label><br>
+        <select id="area">
+            <option value="Kitchen">Kitchen</option>
+            <option value="Bathroom">Bathroom</option>
+            <option value="Living Room">Living Room</option>
+            <option value="Bedroom">Bedroom</option>
+            <option value="Other">Other</option>
+        </select><br><br>
+
+        <label for="description">Description:</label><br>
+        <textarea id="description" rows="4" cols="50" placeholder="Describe problem..."></textarea><br><br>
+
+        <label for="photo">Upload Photo (optional):</label><br>
+        <input type="file" id="photo" accept="image/*"><br><br>
+
+        <button onclick="submitRequest()">Submit</button>
+        <button onclick="toggleRequestForm()">Cancel</button>
+    </div>
+</div>
+
+<script>
+    function signOut() {
+        window.location.href = 'MaintenaceApp.html';
+    }
+    let requests = [];
+    let requestId = 1;
+
+    function toggleRequestForm() {
+        const historyDiv = document.querySelector('.history');
+        const requestForm = document.querySelector('.request-form');
+
+        if (requestForm.style.display === "none") {
+            requestForm.style.display = "block";
+            historyDiv.style.display = "none";
+        } else {
+            requestForm.style.display = "none";
+            historyDiv.style.display = "block";
+        }
+    }
+
+    function submitRequest() {
+        const apartmentNumber = document.getElementById('apartment-number').textContent;
+        const area = document.getElementById('area').value;
+        const description = document.getElementById('description').value;
+        const photo = document.getElementById('photo').files[0];
+        const status = "Pending";
+        const dateTime = new Date().toLocaleString();
+
+        const newRequest = {
+            id: requestId++,
+            apartmentNumber,
+            area,
+            description,
+            dateTime,
+            status,
+            photo
+        };
+
+        requests.push(newRequest);
+        displayRequests();
+
+        document.getElementById('area').value = 'Kitchen';
+        document.getElementById('description').value = '';
+        document.getElementById('photo').value = '';
+        toggleRequestForm();
+    }
+
+    function displayRequests() {
+        const tableBody = document.querySelector("#request-history tbody");
+        tableBody.innerHTML = '';
+
+        requests.forEach(request => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${request.id}</td>
+                <td>${request.apartmentNumber}</td>
+                <td>${request.area}</td>
+                <td>${request.description}</td>
+                <td>${request.dateTime}</td>
+                <td>${request.status}</td>
+                <td>${request.photo ? `<button onclick="viewPhoto(${request.id})">View Photo</button>` : 'No Photo'}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function viewPhoto(id) {
+        const request = requests.find(r => r.id === id);
+        if (request && request.photo) {
+            const fileURL = URL.createObjectURL(request.photo);
+            window.open(fileURL);
+        }
+    }
+
+    requests.push({
+        id: requestId++,
+        apartmentNumber: '101',
+        area: 'Kitchen',
+        description: 'Leaking sink',
+        dateTime: new Date().toLocaleString(),
+        status: 'Completed',
+        photo: null
+    });
+
+    displayRequests();
+</script>
+
+</body>
+</html>
